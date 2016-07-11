@@ -1,0 +1,8 @@
+name: mapalarm
+dependencies:
+  js: ^0.3.0
+  intl: ^0.12.4
+  postgresql:
+  json_object:
+  html: any
+  route: any
