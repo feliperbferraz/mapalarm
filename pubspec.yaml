@@ -6,3 +6,5 @@ dependencies:
   json_object:
   html: any
   route: any
+  appengine: ^0.3.0
+  awsdart: ^0.0.3
