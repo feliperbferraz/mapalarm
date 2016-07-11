@@ -4,10 +4,15 @@ import 'package:postgresql/postgresql.dart';
 
 
 main() async {
-  var server =
-  await HttpServer.bind(InternetAddress.LOOPBACK_IP_V4, 8080);
+//  var server =
+//  await HttpServer.bind(InternetAddress.LOOPBACK_IP_V4, 8080);
 
-  await for (var req in server) {
+  var address  = InternetAddress.ANY_IP_V4;
+  var requestServer =
+  await HttpServer.bind(address, 8080);
+  print('listening on ${address}, port ${requestServer.port}');
+
+  await for (var req in requestServer) {
     ContentType contentType = req.headers.contentType;
 
     if (req.method == 'POST' &&

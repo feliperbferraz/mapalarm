@@ -13,7 +13,7 @@ main() async {
       jsonData['email'] = 'chaves@365.com';
 
     var request = await new HttpClient().post(
-        InternetAddress.LOOPBACK_IP_V4.host, 4049, '/signin2');
+        '52.67.76.53', 8080, '/signin');
     request.headers.contentType = ContentType.JSON;
     request.write(JSON.encode(jsonData));
     HttpClientResponse response = await request.close();
