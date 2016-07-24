@@ -28,7 +28,7 @@ main() async {
         Map jsonData = JSON.decode(jsonString);
         if(pathRoute == 'signin') {
           var flag = sendUserDataToDB(jsonData['name'], jsonData['email']);
-          req.response
+            req.response
             ..statusCode = HttpStatus.OK
             ..write(flag)
             ..close();
@@ -44,7 +44,8 @@ main() async {
       }
     } else {
       req.response..statusCode = HttpStatus.METHOD_NOT_ALLOWED
-        ..write("Unsupported request: ${req.method}.")
+       // ..write("Unsupported request: ${req.method}.")
+        ..write("PFC MapAlarm! Bem-vindo!")
         ..close();
     }
   }
@@ -53,6 +54,7 @@ main() async {
 
 bool sendUserDataToDB(String nome, String email){
   DateTime now = new DateTime.now();
+  print('DENTRO DO SEND TO DB');
   var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
   connect(uri).then((conn) {
 
