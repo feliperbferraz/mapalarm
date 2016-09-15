@@ -126,9 +126,9 @@ void handlePost(HttpRequest req) {
 
       if(jsonData['param'] == 'insert'){
         var flag = insertUserAlarmToDB(jsonData['username'], jsonData['label'] , jsonData['endereco'] ,
-            jsonData['lat'], jsonData['long'], jsonData['raio'], jsonData['status'], res);
-        print(flag);
-        print(res);
+              jsonData['lat'], jsonData['long'], jsonData['raio'], jsonData['status'], res);
+            print(flag);
+            print(res);
 //        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
 //        res.add(flag);
 
@@ -314,7 +314,7 @@ bool findUserAlarmsInDB(String nome, HttpResponse res){
 //INSERINDO ALARMES NO BANCO DE DADOS ASSOCIANDO AO USERNAME
 bool insertUserAlarmToDB(String nome, String label, String endereco, num lat,num long, num raio, bool status, HttpResponse res){
   DateTime now = new DateTime.now();
-  var uri = 'postgres:, res//mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
+  var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
   connect(uri).then((conn) {
     try{
       conn.execute('INSERT INTO alarms (USERNAME, LABEL, ADDRESS, LATITUDE, LONGITUDE, RADIO, STATUS ,CREATED_AT) values (@username, @label, @address, @latitude, @longitude, @radio, @status, @created_at)',
