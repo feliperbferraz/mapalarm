@@ -128,21 +128,22 @@ void handlePost(HttpRequest req) {
         var flag = insertUserAlarmToDB(jsonData['username'], jsonData['label'] , jsonData['endereco'] ,
             jsonData['lat'], jsonData['long'], jsonData['raio'], jsonData['status'], res);
         print(flag);
-        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-        res.add(flag);
+        print(res);
+//        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+//        res.add(flag);
 
       }else if(jsonData['param'] == 'delete'){
         var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
         // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
         print(flag);
-        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-        res.add(flag);
+//        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+//        res.add(flag);
       }else{
         var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
         // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
         print(flag);
-        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-        res.add(flag);
+//        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+//        res.add(flag);
       }
 
     },
