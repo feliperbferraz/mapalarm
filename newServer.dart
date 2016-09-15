@@ -53,7 +53,7 @@ void handleGet(HttpRequest req) {
  //   var aux = new String.fromCharCodes(buffer);
  //   print(buffer);
   //  Map jsonData = JSON.decode(aux);
-   // var flag = findUserDataInDB(jsonData['name'], jsonData['email']);
+   // var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
     // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
    // print(flag);
    // res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
@@ -96,17 +96,11 @@ void handlePost(HttpRequest req) {
       
       var flag = findUserDataInDB(jsonData['username'], jsonData['password'], res);
       // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
-     // print(flag);
-//      res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-      //if(flag){
-       // res.add([1]); }
-      //else{
-       // res.add([2]); }
-     // res.add(jsonData);
-     // res.close();
+      // print(flag);
+      // res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
     },
         onError: printError);
-  }else{
+  }else if(req.uri.path == '/signup') {
     req.listen((List<int> buffer) {
       var file = new File(DATA_FILE);
       var ioSink = file.openWrite(); // save the data to the file
@@ -123,6 +117,38 @@ void handlePost(HttpRequest req) {
     //  res.close();
     },
         onError: printError);
+  }else if(req.uri.path == '/alarm'){
+
+    req.listen((List<int> buffer) {
+      var aux = new String.fromCharCodes(buffer);
+      print(buffer);
+      Map jsonData = JSON.decode(aux);
+
+      if(jsonData['param'] == 'insert'){
+        var flag = insertUserAlarmToDB(jsonData['username'], jsonData['label'] , jsonData['endereco'] ,
+            jsonData['lat'], jsonData['long'], jsonData['raio'], jsonData['status'], res);
+        print(flag);
+        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        res.add(flag);
+
+      }else if(jsonData['param'] == 'delete'){
+        var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
+        // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
+        print(flag);
+        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        res.add(flag);
+      }else{
+        var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
+        // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
+        print(flag);
+        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        res.add(flag);
+      }
+
+    },
+        onError: printError);
+  }else if(req.uri.path == '/getAlarm'){
+
   }
 
 }
@@ -255,6 +281,58 @@ var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east
 
 });
 
+}
+
+//BUSCANDO ALARMES NO BANCO DE DADOS DE ACORDO COM O USERNAME
+bool findUserAlarmsInDB(String nome, HttpResponse res){
+  var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
+  connect(uri).then((conn) {
+    print("QUERYING ALARM FROM USER: " + nome);
+    //QUERYING
+    conn.query(
+        'SELECT * FROM alarms WHERE username = @username', {'username': nome})
+        .toList()
+        .then((rows) {
+      for (var row in rows) {
+        print(row); // Refer to columns by name,
+        //print(row[0]);   Or by column index.
+        if (row[0] != null) {
+          res.add(row.codeUnits);
+        }
+        else {
+          print("no else");
+          res.add([50]);
+        }
+      }
+      res.close();
+    });
+  });
+  return true;
+ }
+
+//INSERINDO ALARMES NO BANCO DE DADOS ASSOCIANDO AO USERNAME
+bool insertUserAlarmToDB(String nome, String label, String endereco, num lat,num long, num raio, bool status, HttpResponse res){
+  DateTime now = new DateTime.now();
+  var uri = 'postgres:, res//mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
+  connect(uri).then((conn) {
+    try{
+      conn.execute('INSERT INTO alarms (USERNAME, LABEL, ADDRESS, LATITUDE, LONGITUDE, RADIO, STATUS ,CREATED_AT) values (@username, @label, @address, @latitude, @longitude, @radio, @status, @created_at)',
+          {'username': nome, 'label': label, 'address': endereco, 'latitude': lat, 'longitude': long, 'radio': raio, 'status': status, 'created_at': now }).then((result) {
+        print(result);
+        print('done!');
+        res.add([49]);
+        res.close();
+        conn.close();
+
+      });
+    } catch(e){
+      print(e);
+      res.add([50]);
+      res.close();
+    }
+  });
+
+  return true;
 }
 
 
