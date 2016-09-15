@@ -132,14 +132,14 @@ void handlePost(HttpRequest req) {
 //        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
 //        res.add(flag);
 
-      }else if(jsonData['param'] == 'delete'){
-        var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
+      }else if(jsonData['param'] == 'my_alarms'){
+        var flag = findUserAlarmsInDB(jsonData['username'], res);
         // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
         print(flag);
 //        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
 //        res.add(flag);
       }else{
-        var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
+        var flag = findUserAlarmsInDB(jsonData['username'], res);
         // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
         print(flag);
 //        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
