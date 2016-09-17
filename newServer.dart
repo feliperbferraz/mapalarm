@@ -47,32 +47,9 @@ void handleGet(HttpRequest req) {
   HttpResponse res = req.response;
   print("${req.method}: ${req.uri.path}");
   addCorsHeaders(res);
-//  req.uri.
-//  print(req);
-//  req.listen((List<int> buffer) {
- //   var aux = new String.fromCharCodes(buffer);
- //   print(buffer);
-  //  Map jsonData = JSON.decode(aux);
-   // var flag = findUserDataInDB(jsonData['name'], jsonData['email'], res);
-    // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
-   // print(flag);
-   // res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
    var aux = 'Bem-vindo! PFC MapAlarm - Felipe Ferraz, Rafael Chaves e Raffael Russo. Orientador: Maj Anderson.'; 
    res.add(aux.codeUnits);
-  //},
-   //   onError: printError);
-
-//  var file = new File(DATA_FILE);
-//  if (file.existsSync()) {
-//    res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-//    file.readAsBytes().asStream().pipe(res); // automatically close output stream
-//  }
-//  else {
-//    var err = "Could not find file: $DATA_FILE";
-//    res.addString(err);
-
     res.close();
-//  }
 
 }
 
@@ -92,12 +69,8 @@ void handlePost(HttpRequest req) {
       print("DENTRO DO /LOGIN");
       print(buffer);
       Map jsonData = JSON.decode(aux);
-      //print(jsonData['name']);
-      
+
       var flag = findUserDataInDB(jsonData['username'], jsonData['password'], res);
-      // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
-      // print(flag);
-      // res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
     },
         onError: printError);
   }else if(req.uri.path == '/signup') {
@@ -108,13 +81,9 @@ void handlePost(HttpRequest req) {
       var aux = new String.fromCharCodes(buffer);
       Map jsonData = JSON.decode(aux);
       var flag = sendUserDataToDB(jsonData['username'], jsonData['email'], jsonData['password'], res);
-      // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
       print(flag);
       ioSink.close();
 
-      // return the same results back to the client
-     // res.add(buffer);
-    //  res.close();
     },
         onError: printError);
   }else if(req.uri.path == '/alarm'){
@@ -125,31 +94,31 @@ void handlePost(HttpRequest req) {
       Map jsonData = JSON.decode(aux);
 
       if(jsonData['param'] == 'insert'){
-        var flag = insertUserAlarmToDB(jsonData['username'], jsonData['label'] , jsonData['endereco'] ,
+        var flag = insertUserAlarmToDB(jsonData['email'], jsonData['label'] , jsonData['endereco'] ,
               jsonData['lat'], jsonData['long'], jsonData['raio'], jsonData['status'], res);
             print(flag);
             print(res);
-//        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-//        res.add(flag);
 
       }else if(jsonData['param'] == 'my_alarms'){
-        var flag = findUserAlarmsInDB(jsonData['username'], res);
-        // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
+        var flag = findUserAlarmsInDB(jsonData['email'], res);
         print(flag);
-//        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-//        res.add(flag);
-      }else{
-        var flag = findUserAlarmsInDB(jsonData['username'], res);
-        // var flag = sendUserDataToDB(buffer['name'], buffer['email']);
+
+      }else if(jsonData['param'] == 'update'){
+        var flag = updateAlarmStatus(jsonData['email'], jsonData['label'], jsonData['status'], res);
         print(flag);
-//        res.headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-//        res.add(flag);
+        print(res);
+
+      }else if(jsonData['param'] == 'delete'){
+        var flag = deleteAlarm(jsonData['email'], jsonData['label'], res);
+        print(flag);
+        print(res);
+
       }
 
     },
         onError: printError);
-  }else if(req.uri.path == '/getAlarm'){
-
+  }else{
+      print("Rota nao autorizada.");
   }
 
 }
@@ -206,29 +175,11 @@ bool sendUserDataToDB(String nome, String email, String senha, HttpResponse res)
        // print(row.username); // Refer to columns by name,
         print(row[0]);    // Or by column index.
         if(row[0] ==1){
-        res.add([50]);
-        res.close();
-        conn.close();  
+          res.add([50]);
+          res.close();
+          conn.close();
         }
-      //else{
-      //      conn.execute('insert into users (USERNAME, EMAIL,PASSWORD, CREATED_AT) values (@username, @email,@password, @created_at)',
-      //  {'username': nome, 'email': email, 'password': senha, 'created_at': now }).then((_) { 
-      //print('done!');
-      //var aux = 'usuario incluido';
-      //res.add(aux.codeUnits);
-      //res.close();
-      //conn.close();
-      
-    //});
-    
-  //}
-       }});
-
-         
-     // }
-   // );
-
-
+      }});
     //EXECUTING INSERT A NEW USER
    try{
     conn.execute('insert into users (USERNAME, EMAIL,PASSWORD, CREATED_AT) values (@username, @email,@password, @created_at)',
@@ -251,15 +202,12 @@ bool sendUserDataToDB(String nome, String email, String senha, HttpResponse res)
 }
 
 
-findUserDataInDB(String nome, String senha, HttpResponse res){
- // DateTime now = new DateTime.now();
-print("URI");
+findUserDataInDB(String email, String senha, HttpResponse res){
 var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
   connect(uri).then((conn) {
     print("QUERYING");
     print(senha);
-    //QUERYING BY EMAIL! BUT THE NAME IS USERNAME! WHY? DUNO..
-    conn.query('SELECT password FROM users WHERE email = @username', {'username': nome}).toList().then((rows) {
+    conn.query('SELECT password FROM users WHERE email = @email', {'email': email}).toList().then((rows) {
       for (var row in rows) {
         print("Usuario cadastrado"); // Refer to columns by name,
         print(row[0]);    // Or by column index.
@@ -271,14 +219,6 @@ var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east
       }
     res.close(); 
     });
-
-    //EXECUTING INSERT A NEW USER
-//    conn.execute('insert into users (NAME, EMAIL, CREATED_AT) values (@name, @email, @created_at)',
-//        {'name': nome, 'email': email, 'created_at': now }).then((_) {
-//
-//      print('done!');
-//
-//    });
 
 });
 
@@ -343,5 +283,53 @@ bool insertUserAlarmToDB(String nome, String label, String endereco, num lat,num
   return true;
 }
 
+//UPDATE NO STATUS DO ALARME
+bool updateAlarmStatus(String email, String label, bool status, HttpResponse res){
+  var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
+  connect(uri).then((conn) {
+    try{
+      conn.execute('UPDATE  alarms SET STATUS  = @status WHERE LABEL = @label AND EMAIL = @email',
+          {'label': label, 'status': status, 'email':email}).then((result) {
+        print(result);
+        print('Status do alarme alterado com sucesso.');
+        res.add([49]);
+        res.close();
+        conn.close();
+
+      });
+    } catch(e){
+      print(e);
+      res.add([50]);
+      res.close();
+    }
+  });
+
+  return true;
+}
+
+
+//APAGANDO UM ALARME DA LISTA DO USUARIO
+bool deleteAlarm( String email, String label, HttpResponse res){
+  var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
+  connect(uri).then((conn) {
+    try{
+      conn.execute('DELETE FROM alarms WHERE label = @label and email = @email',
+          {'label': label, 'email': email}).then((result) {
+        print(result);
+        print('Alarme deletado com sucesso.');
+        res.add([49]);
+        res.close();
+        conn.close();
+
+      });
+    } catch(e){
+      print(e);
+      res.add([50]);
+      res.close();
+    }
+  });
+
+  return true;
+}
 
 void printError(error) => print(error);
