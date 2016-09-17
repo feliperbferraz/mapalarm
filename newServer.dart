@@ -258,8 +258,8 @@ var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east
   connect(uri).then((conn) {
     print("QUERYING");
     print(senha);
-    //QUERYING
-    conn.query('SELECT password FROM users WHERE username = @username', {'username': nome}).toList().then((rows) {
+    //QUERYING BY EMAIL! BUT THE NAME IS USERNAME! WHY? DUNO..
+    conn.query('SELECT password FROM users WHERE email = @username', {'username': nome}).toList().then((rows) {
       for (var row in rows) {
         print("Usuario cadastrado"); // Refer to columns by name,
         print(row[0]);    // Or by column index.
@@ -285,20 +285,27 @@ var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east
 }
 
 //BUSCANDO ALARMES NO BANCO DE DADOS DE ACORDO COM O USERNAME
-bool findUserAlarmsInDB(String nome, HttpResponse res){
+bool findUserAlarmsInDB(String user_email, HttpResponse res){
   var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
   connect(uri).then((conn) {
-    print("QUERYING ALARM FROM USER: " + nome);
+    print("QUERYING ALARM FROM USER: " + user_email);
     //QUERYING
     conn.query(
-        'SELECT * FROM alarms WHERE username = @username', {'username': nome})
+        'SELECT * FROM alarms WHERE email = @email', {'email': user_email})
         .toList()
         .then((rows) {
       for (var row in rows) {
         print(row); // Refer to columns by name,
         //print(row[0]);   Or by column index.
         if (row[0] != null) {
-          res.add(row.codeUnits);
+          print(row);
+          var i = 0;
+          for(i = 2; i < 8; i++)
+          {
+          var aux = row[i].toString() + "|";
+          res.add(aux.codeUnits);
+          //res.add(row.codeUnits);
+        }
         }
         else {
           print("no else");
@@ -317,8 +324,8 @@ bool insertUserAlarmToDB(String nome, String label, String endereco, num lat,num
   var uri = 'postgres://mapalarmadminbd:majends123@mapalarmdb.cs14yv54tnrf.sa-east-1.rds.amazonaws.com:5432/mapalarmbd';
   connect(uri).then((conn) {
     try{
-      conn.execute('INSERT INTO alarms (USERNAME, LABEL, ADDRESS, LATITUDE, LONGITUDE, RADIO, STATUS ,CREATED_AT) values (@username, @label, @address, @latitude, @longitude, @radio, @status, @created_at)',
-          {'username': nome, 'label': label, 'address': endereco, 'latitude': lat, 'longitude': long, 'radio': raio, 'status': status, 'created_at': now }).then((result) {
+      conn.execute('INSERT INTO alarms (EMAIL, LABEL, ADDRESS, LATITUDE, LONGITUDE, RADIO, STATUS ,CREATED_AT) values (@email, @label, @address, @latitude, @longitude, @radio, @status, @created_at)',
+          {'email': nome, 'label': label, 'address': endereco, 'latitude': lat, 'longitude': long, 'radio': raio, 'status': status, 'created_at': now }).then((result) {
         print(result);
         print('done!');
         res.add([49]);
